@@ -4,7 +4,6 @@
 
 #include "NaiveBayes.h"
 
-#include <iostream>
 
 
 void NaiveBayes::fit(MatrixXd X, VectorXi y) {
@@ -28,12 +27,34 @@ void NaiveBayes::fit(MatrixXd X, VectorXi y) {
 
 }
 
-MatrixXd NaiveBayes::predict(MatrixXd X) {
-    for (int i=0; i<pC.size(); ++i)
-        std::cout << pC(i) << " ";
+MatrixXd NaiveBayes::predict_proba(MatrixXd X) {
+    // Naive bayes can be viewed as a linear classifier when expressed in log space
+    // where pC is the bias
+    MatrixXd rel_probs = X * pXC;
+    rel_probs.rowwise() += pC.transpose();
 
-    MatrixXd predictions;
-    return predictions;
+    return rel_probs;
+}
+
+VectorXi NaiveBayes::predict(MatrixXd X) {
+    MatrixXd rel_probs = predict_proba(X);
+    VectorXi maxVal(rel_probs.rows());
+    for (int r=0; r<rel_probs.rows(); ++r) {
+        float max = -std::numeric_limits<float>::max();
+        int argmax = 0;
+
+        // Calculate the max prob for this row
+        for (int c=0; c<rel_probs.cols(); ++c) {
+            if (rel_probs(r, c) > max) {
+                max = rel_probs(r, c);
+                argmax = c;
+            }
+        }
+        maxVal(r) = argmax;
+    }
+    std::cout << rel_probs << "\n";
+    std::cout << maxVal << "\n";
+    return maxVal;
 }
 
 float NaiveBayes::getClassProb(VectorXi v, int c) {
@@ -43,7 +64,7 @@ float NaiveBayes::getClassProb(VectorXi v, int c) {
         if (v(i) == c)
             n_class++;
     }
-    return float(n_class) / v.size();
+    return log(float(n_class) / v.size());
 }
 
 float NaiveBayes::getClassCondProb(MatrixXd X, VectorXi y, int i, int c) {
@@ -62,5 +83,7 @@ float NaiveBayes::getClassCondProb(MatrixXd X, VectorXi y, int i, int c) {
         }
     }
     float smoothed = (Nyi + alpha) / (Ny + alpha*y.maxCoeff());
-    return smoothed;
+    return log(smoothed);
 }
+
+

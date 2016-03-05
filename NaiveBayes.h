@@ -6,6 +6,9 @@
 #define INNOCENT_BAYES_NAIVEBAYES_H
 
 #include <set>
+#include <iostream>
+#include <limits.h>
+#include <math.h>
 
 #include "Eigen/Core"
 
@@ -19,7 +22,8 @@ public:
     static float getClassCondProb(MatrixXd X, VectorXi y, int i, int c);
 
     void fit(MatrixXd X, VectorXi y);
-    MatrixXd predict(MatrixXd X);
+    MatrixXd predict_proba(MatrixXd X);
+    VectorXi predict(MatrixXd X);
 
 private:
     // Prob of classes in the training set
