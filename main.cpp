@@ -7,7 +7,7 @@
 using namespace std;
 
 int main() {
-    MatrixXf X(10, 2);
+    MatrixXd X(10, 2);
     VectorXi y(10);
 
     X << 1.0, 2.2,

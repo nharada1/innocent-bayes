@@ -16,12 +16,16 @@ public:
     NaiveBayes() {};
 
     static float getClassProb(VectorXi v, int c);
+    static float getClassCondProb(MatrixXd X, VectorXi y, int i, int c);
 
-    void fit(MatrixXf X, VectorXi y);
-    MatrixXf predict(MatrixXf X);
+    void fit(MatrixXd X, VectorXi y);
+    MatrixXd predict(MatrixXd X);
 
 private:
+    // Prob of classes in the training set
     VectorXd pC;
+    // Accessing (i, k) gives P(x_i|C_k), where i is the feature, k is the class
+    MatrixXd pXC;
 };
 
 
